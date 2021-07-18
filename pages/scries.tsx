@@ -29,85 +29,80 @@ interface ScriesProps {
 }
 
 function getSegmentVar(seg: string) {
-      if (seg.startsWith('[') && seg.endsWith('+]')) {
-        return seg.slice(1, -2);
-      }
-      if (seg.startsWith('[') && seg.endsWith(']')) {
-        return seg.slice(1, -1);
-      }
-
+  if (seg.startsWith('[') && seg.endsWith('+]')) {
+    return seg.slice(1, -2);
+  }
+  if (seg.startsWith('[') && seg.endsWith(']')) {
+    return seg.slice(1, -1);
+  }
 }
 
 function getExamplePath(path: string, parameters: ScryParameters) {
   return path
     .split('/')
-    .map((seg) => {
-    })
+    .map((seg) => {})
     .join('/');
 }
-const colors = [
-  'red',
-  'green',
-  'blue',
-  'yellow',
-  'orange',
-  'purple',
-  'pink'
-];
+const colors = ['red', 'green', 'blue', 'yellow', 'orange', 'purple', 'pink'];
 
-function Path(props: { path: string; }) {
+function Path(props: { path: string }) {
   const { path } = props;
-  const [segments] = _.reduce(path.split('/'), ([segs, count], seg, idx) => {
-    const newSegs = idx.length === 0 ? [...segs] : [...segs, '/'];
-    if(seg.length === 0) {
-      return [segs, count];
-    }
-    if(seg.startsWith('[')) {
-      const color = colors[count];
-      newSegs.push(<span key={seg} className={`text-${color}`}>{seg}</span>);
+  const [segments] = _.reduce(
+    path.split('/'),
+    ([segs, count], seg, idx) => {
+      const newSegs = idx === 0 ? [...segs] : [...segs, '/'];
+      if (seg.length === 0) {
+        return [segs, count];
+      }
+      if (seg.startsWith('[')) {
+        const color = colors[count];
+        newSegs.push(
+          <span key={seg} className={`text-${color}`}>
+            {seg}
+          </span>
+        );
 
-      return [newSegs, count+1];
-    }
-    return [[...newSegs, <span key={seg}>{seg}</span>], count];
-  }, [[], 0] as [JSX.Element[], number]);
-
-  return (
-    <div className="p-2 rounded bg-washedGray font-mono">
-      {segments}
-    </div>
+        return [newSegs, count + 1];
+      }
+      return [[...newSegs, <span key={seg}>{seg}</span>], count];
+    },
+    [[], 0] as [JSX.Element[], number]
   );
+
+  return <div className="p-2 rounded bg-washedGray font-mono">{segments}</div>;
 }
 
-function ExamplePath(props: { path: string; params: ScryParms }) {
+function ExamplePath(props: { path: string; params: ScryParameters }) {
   const { path, params } = props;
-  const [segments] = _.reduce(path.split('/'), ([segs, count], seg, idx) => {
-    const newSegs = idx.length === 0 ? [...segs] : [...segs, '/'];
-    if(seg.length === 0) {
-      return [segs, count];
-    }
-    const segVar = getSegmentVar(seg);
-    if(segVar) {
-      const color = colors[count];
-      newSegs.push(<span key={seg} className={`text-${color}`}>{params[segVar].example}</span>);
+  const [segments] = _.reduce(
+    path.split('/'),
+    ([segs, count], seg, idx) => {
+      const newSegs = idx === 0 ? [...segs] : [...segs, '/'];
+      if (seg.length === 0) {
+        return [segs, count];
+      }
+      const segVar = getSegmentVar(seg);
+      if (segVar) {
+        const color = colors[count];
+        newSegs.push(
+          <span key={seg} className={`text-${color}`}>
+            {params[segVar].example}
+          </span>
+        );
 
-      return [newSegs, count+1];
-    }
-    return [[...newSegs, <span>{seg}</span>], count];
-  }, [[], 0] as [JSX.Element[], number]);
+        return [newSegs, count + 1];
+      }
+      return [[...newSegs, <span key={seg}>{seg}</span>], count];
+    },
+    [[], 0] as [JSX.Element[], number]
+  );
 
   return (
     <div className="p-4 flex-col flex rounded border-2 mb-4 ">
-      <div className="font-semibold font-md mb-4">
-        Example
-      </div>
-      <div className="p-2 rounded bg-washedGray font-mono">
-        {segments}
-
-      </div>
+      <div className="font-semibold font-md mb-4">Example</div>
+      <div className="p-2 rounded bg-washedGray font-mono">{segments}</div>
     </div>
-
   );
-
 }
 
 function Scry(props: { doc: ScryPath; path: string }) {
@@ -121,7 +116,10 @@ function Scry(props: { doc: ScryPath; path: string }) {
 
   return (
     <div className="mb-5">
-      <div className="border-2 rounded flex flex-col mb-4 rounded p-4" onClick={onClick}>
+      <div
+        className="border-2 rounded flex flex-col mb-4 rounded p-4"
+        onClick={onClick}
+      >
         <div className="text-lg mb-4 font-semibold">{result?.summary}</div>
         <Path path={path} />
       </div>
@@ -137,27 +135,34 @@ function Scry(props: { doc: ScryPath; path: string }) {
                   const color = colors[idx];
 
                   return (
-                  <div className="mb-2 grid max-w-md grid-cols-param" key={param}>
-                    <div className={`mr-2 p-2 rounded flex items-center justify-center font-mono bg-${color} bg-opacity-70 `}>
-                      {param}
+                    <div
+                      className="mb-2 grid max-w-md grid-cols-param"
+                      key={param}
+                    >
+                      <div
+                        className={`mr-2 p-2 rounded flex items-center justify-center font-mono bg-${color} bg-opacity-70 `}
+                      >
+                        {param}
+                      </div>
+                      <div className={`items-center flex`}>{description}</div>
                     </div>
-                    <div className={`items-center flex`} >{description}</div>
-                  </div>
-                  )
+                  );
                 })}
               </div>
             </div>
           ) : null}
           {result ? (
             <div className="p-4 flex flex-col rounded bg-washedGray">
-              <div className="font-lg font-semibold text-lg text-semibold mb-2">Result</div>
+              <div className="font-lg font-semibold text-lg text-semibold mb-2">
+                Result
+              </div>
               <div className="flex items-center">
-                <div className={`py-2 px-4 rounded bg-${resultColor} font-mono mr-2`}>
+                <div
+                  className={`py-2 px-4 rounded bg-${resultColor} font-mono mr-2`}
+                >
                   %{result.mark}
                 </div>
-                <div>
-                  {result.description}
-                </div>
+                <div>{result.description}</div>
               </div>
             </div>
           ) : null}
@@ -279,6 +284,7 @@ export const DEFAULT_SCRIES: ScryDoc = {
                 'An %add-nodes update containing the siblings of the requested node',
               mark: 'graph-update-2',
             },
+            children: {},
             parameters: {
               ...KITH_PARAMS,
               ...NODE_PARAMS,
@@ -302,6 +308,7 @@ export const DEFAULT_SCRIES: ScryDoc = {
                 'An %add-nodes update containing the children of the requested node',
               mark: 'graph-update-2',
             },
+            children: {},
             parameters: {
               ...KITH_PARAMS,
               ...NODE_PARAMS,
@@ -358,9 +365,12 @@ export default function Scries(props: ScriesProps) {
         <title>Scries | Graph Store</title>
       </Head>
       <div className="mb-6">
-      <div className="text-xl font-bold mb-2">Graph Store Scries</div>
-      <div>This is documentation of the upcoming changes to graph-store's scry API</div>
-    </div>
+        <div className="text-xl font-bold mb-2">Graph Store Scries</div>
+        <div>
+          This is documentation of the upcoming changes to graph-store&apos;s scry
+          API
+        </div>
+      </div>
       {_.map(flattenScryDoc(scries), (scry, path) => (
         <Scry key={path} path={path} doc={scry} />
       ))}
