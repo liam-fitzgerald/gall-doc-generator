@@ -126,6 +126,7 @@ function Scry(props: { doc: ScryPath; path: string }) {
       {expand ? (
         <div className="ml-4">
           <ExamplePath path={path} params={parameters} />
+          {/** TODO: shouldn't depend on key order */}
           {Object.keys(parameters).length > 0 ? (
             <div className="mb-4 rounded flex flex-col p-4 bg-washedGray">
               <div className="text-lg font-medium mb-4">Parameters</div>
@@ -272,9 +273,9 @@ export const DEFAULT_SCRIES: ScryDoc = {
             },
             children: {},
             parameters: {
-              ...NODE_PARAMS,
               ...KITH_PARAMS,
               ...SUBSET_PARAMS,
+              ...NODE_PARAMS,
             },
           },
           '/siblings/[direction]/[mode]/[count]/[index+]': {
@@ -286,19 +287,19 @@ export const DEFAULT_SCRIES: ScryDoc = {
             },
             children: {},
             parameters: {
-              ...KITH_PARAMS,
-              ...NODE_PARAMS,
               count: {
                 description: 'A limit for the number of nodes returned',
                 example: '100',
                 format: 'atom',
               },
+              ...KITH_PARAMS,
               direction: {
                 description:
                   "Either 'older' or 'newer'. If newer, then load the siblings with keys that are larger than the requested node. Else, load the siblings with smaller keys",
                 example: 'older',
                 format: 'cord',
               },
+              ...NODE_PARAMS,
             },
           },
           '/siblings/[edge]/[mode]/[count]/[index+]': {
@@ -310,19 +311,19 @@ export const DEFAULT_SCRIES: ScryDoc = {
             },
             children: {},
             parameters: {
-              ...KITH_PARAMS,
-              ...NODE_PARAMS,
               count: {
                 description: 'A limit for the number of nodes returned',
                 example: '100',
                 format: 'atom',
               },
+              ...KITH_PARAMS,
               edge: {
                 description:
                   "Either 'oldest' or 'newest'. If oldest, start returning the children with the smallest keys. Else, return the children with the largest keys.",
                 example: 'newest',
                 format: 'atom',
               },
+              ...NODE_PARAMS,
             },
           },
         },
@@ -356,6 +357,10 @@ function flattenScryDoc(
   return result;
 }
 
+function Code(props: React.PropsWithChildren<{}>) {
+  return <span className="px-1 py-1 font-mono bg-washedGray">{props.children}</span>;
+}
+
 export default function Scries(props: ScriesProps) {
   const { scries = DEFAULT_SCRIES } = props;
 
@@ -367,8 +372,11 @@ export default function Scries(props: ScriesProps) {
       <div className="mb-6">
         <div className="text-xl font-bold mb-2">Graph Store Scries</div>
         <div>
-          This is documentation of the upcoming changes to graph-store&apos;s scry
-          API
+          This is documentation of the upcoming changes to graph-store&apos;s
+          scry API. In the path format <Code>[var]</Code> represents a single
+          path element that should be interpolated as a variable, and{' '}
+          <Code>[var+]</Code>represents a variable that could be one or more
+          elements
         </div>
       </div>
       {_.map(flattenScryDoc(scries), (scry, path) => (
